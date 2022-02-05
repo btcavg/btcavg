@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <head>
+        <style>
+        table {
+          font-family: arial, sans-serif;
+          border-collapse: collapse;
+          width: 100%;
+        }
+        
+        td, th {
+          border: 1px solid #dddddd;
+          text-align: left;
+          padding: 5px;
+        }
+        .grid-container {
+  display: grid;
+  text-align: center;
+  grid-template-columns: auto auto auto auto auto;
+  padding: 5px;
+  grid-gap: 10px;
+}
+        </style>
+</head>
+<body>
+
+<h1>Average Price</h1>
+<label for="tokenname">Token Name</label><br>
+<input type="text" id="tokenname" name="tokenname" required><br><br>
+<input type="button" id="create" name="create" value="Create Fields" required ><br>
+<div class="grid-container">
+  <div id="day1" class="am" field=1> 
+   <h4><b>Amount 1</b></h4>
+    <label for="invested">Invested</label><br>
+    <input type="text" class="invested" id="invested1"  field=1 required value=0 ><br><br>
+    <label for="price">Price</label><br>
+    <input type="text" class="price" id="price1" field=1 required value=0 ><br><br>
+    <label for="quantity">Qantity</label><br>
+    <input type="text" class="quantity" id="quantity1" required disabled value=0 ><br><br>
+    <input type="button" id="1" class="clear" value="clear" ><br><br>
+  </div>
+
+  <div id="day2" class="am" field=2>
+   <h4><b>Amount 2</b></h4>
+    <label for="invested">Invested</label><br>
+    <input type="text" class="invested"  id="invested2"  field=2 required value=0><br><br>
+    <label for="price">Price</label><br>
+    <input type="text" class="price"  id="price2" field=2 value=0 required ><br><br>
+    <label for="quantity">Qantity</label><br>
+    <input type="text" class="quantity" id="quantity2"  required disabled value=0 ><br><br>
+    <input type="button" id="2" class="clear" value="clear"  ><br><br>
+  </div>
+  <input type="hidden" id="latest" value=2 />
+
+</div>
+<input type="button" id="calc" name="Calculate" value="Calculate" required ><br><br>
+<b>Total Invested Amount :</b><span id="ia"></span><br>
+<b>Total Quantity :</b><span id="qty"></span><br>
+<b>Average :</b><span id="avg"></span><br>
+
+<h3 style="margin-bottom:5px ;" ><b>Multiply</b></h3>
+Quanity <input type="text" class="qq" id="qq"  required disabled value=0 > X <input type="text" class="prc" id="prc"  required value=0 > = <input type="text" class="ans" id="ans"  required disabled value=0 >
+<br><br>
+  <div id="tablehere">
+      <table>
+          <thead>
+        <tr>
+            <th>Day</th>
+            <th>Invested</th>
+            <th>Price</th>
+            <th>Qantity</th>
+
+          </tr>
+        </thead>
+        <tbody>
+<tr id="tday1">
+<td >1</td>
+<td id="tabi1">0</td>
+<td id="tabp1">0</td>
+<td id="tabq1">0</td>
+</tr>
+<tr id="tday2">
+  <td >2</td>
+  <td id="tabi2">0</td>
+  <td id="tabp2">0</td>
+  <td id="tabq2">0</td>
+  </tr> 
+      </tbody>
+        </table>
+  </div>
+  <script>
+
+    $(document).ready(function(){
+
+function mul(){
+var prc=qq=0;
+prc= $("#prc").val(); 
+qq= $("#qq").val(); 
+var ans= prc*qq;
+$("#ans").val(ans); 
+};
+
+function calc(){
+
+  var tia=qty=avg=0;
+  $('.invested').each(function(){
+    tia+=parseFloat(this.value);
+  });
+  $('.quantity').each(function(){
+    qty+=parseFloat(this.value);
+  });
+
+  $("#ia").text(tia)  ;   
+  $("#qty").text(qty)  ;
+  avg=parseFloat(tia/qty);
+  $("#avg").text(avg);    
+  $("#prc").val(avg); 
+  $("#qq").val(qty);
+  mul();
+};
+
+
+$(document).on("click",'#create',function(e)
+{
+
+  var latest=$("#latest").val();
+  var make=parseInt(latest)+1;
+
+var htmldata='<div id="day'+ make +'" class="am" field='+ make +'>'+
+  '<h4><b>Amount '+make+'</b></h4>'+
+    '<label for="invested">Invested</label><br>'+
+    '<input type="text" class="invested"  id="invested'+make+'"  field='+make+' required value=0><br><br>'+
+    '<label for="price">Price</label><br>'+
+    '<input type="text" class="price"  id="price'+make+'" field='+make+' value=0 required ><br><br>'+
+    '<label for="quantity">Qantity</label><br>'+
+    '<input type="text" class="quantity" id="quantity'+make+'"  required disabled value=0 ><br><br>'+
+    '<input type="button" id="'+make+'" class="clear" value="clear"  >      <input type="button" value="del" class="del" del="'+make+'"  ><br><br>'+
+  '</div>';
+  tabledata='<tr id="tday'+make+'"><td >'+make+'</td><td id="tabi'+make+'">0</td><td id="tabp'+make+'">0</td><td id="tabq'+make+'">0</td></tr>';
+
+$(htmldata).insertAfter("#day"+latest);
+$(tabledata).insertAfter("#tday"+latest);
+$("#latest").val(make);
+});
+
+
+      $(document).on("click",'.clear',function( event ) {
+         var id = $(this).attr("id");
+         $("#invested"+id).val(0);
+         $("#price"+id).val(0);
+         $("#quantity"+id).val(0);
+         $("#tabi"+id).text(0);
+         $("#tabp"+id).text(0);
+         $("#tabq"+id).text(0);
+         calc();
+    });
+
+    $(document).on("click",'.del',function( event ) {
+         var id = $(this).attr('del');
+         $("#day"+id).remove();
+         $("#tday"+id).remove();
+         calc();
+         var lat=$('.am').last().attr("field");
+         $("#latest").val(lat);
+
+    });   
+    
+    
+    $(document).on('keyup','#prc',function( event ) {
+          event.preventDefault();
+          mul();
+});    
+
+
+
+    $(document).on('keyup','.invested',function( event ) {
+          event.preventDefault();
+          var field = $(this).attr("field");
+          var invested=$(this).val();
+          var price =$("#price"+field).val();
+          var out=(invested/price).toFixed(5);
+          $("#quantity"+field).val(out);  
+          $("#tabi"+field).text(invested);
+          $("#tabp"+field).text(price);
+          $("#tabq"+field).text(out);
+          
+          calc();  
+});
+      
+        $(document).on('keyup','.price',function( event ) {
+          event.preventDefault();
+          var field = $(this).attr("field");
+          var price=$(this).val();
+          var invested =$("#invested"+field).val();
+          var out=(invested/price).toFixed(5);
+          $("#quantity"+field).val(out);     
+          $("#tabi"+field).text(invested);
+          $("#tabp"+field).text(price);
+          $("#tabq"+field).text(out);
+          calc();  
+});
+
+        $(document).on('click','#calc',function(e)
+{
+calc(); 
+});
+  
+  }); 
+    </script>
+</body>
+</html>
